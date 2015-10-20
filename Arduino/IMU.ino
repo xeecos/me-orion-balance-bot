@@ -27,8 +27,9 @@ void IMU_fillter(void)
   if (FLAG & START)
     if (  compAngleY > 20 ||  compAngleY < -30)
     {
-      MOTOR(0, 0);
-      MOTOR(1, 0);
+      runMotor(0, 0);
+      runMotor(1, 0);
+      delay(100);
       while (1);
     }
   //Serial.println(compAngleY);

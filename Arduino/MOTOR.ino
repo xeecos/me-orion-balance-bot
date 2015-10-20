@@ -1,12 +1,12 @@
-void MOTOR(char TYPE, int SPEED)
+void runMotor(char type, int speed)
 {
-  if (TYPE)
+  if (type)
   {
-    encoder.setPWM(0, -SPEED);
+    encoder.setPWM(0, -speed);
   }
   else
   {
-    encoder.setPWM(1, SPEED);
+    encoder.setPWM(1, speed);
   }
 }
 

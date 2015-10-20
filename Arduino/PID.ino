@@ -32,8 +32,8 @@ void PID_angle_compute(void)
     pwm_right = constrain(pwm_right, -spd, spd);
 
 #ifdef MOTOR_ENABLE
-    MOTOR(0, pwm_left);
-    MOTOR(1, pwm_right);
+    runMotor(0, pwm_left);
+    runMotor(1, pwm_right);
 #endif
 
     PID_angle.Timer = micros();

@@ -77,9 +77,9 @@ void setup()
 
   /*********************其他初始化********************/
   PID_angle.Setpoint = RELAX_ANGLE;
-  PID_angle.P = 18.0;//18
-  PID_angle.I = 0.1;//0.1
-  PID_angle.D = 0.0006;//0.0005
+  PID_angle.P = 30.0;//18
+  PID_angle.I = 0.05;//0.1
+  PID_angle.D = 0.0003;//0.0005
 
   PID_turn.P = 10;
   PID_turn.D = 30;
