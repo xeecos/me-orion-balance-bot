@@ -3,7 +3,6 @@ void parseJoystick(unsigned char irCode)
   if(irCode==0xff||irCode==0){
     return;
   }
-//  Serial.println(irCode,HEX);
   switch(irCode){
     case IR_BUTTON_UP:{
       FLAG |= MOVING;

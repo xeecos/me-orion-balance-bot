@@ -5,25 +5,25 @@
 #include <Wire.h>
 #include <SoftwareSerial.h>
 
-#define RELAX_ANGLE 7.5 //自然平衡角度
-#define MOTOR_ENABLE     //使能电机
+#define RELAX_ANGLE 7.5 //Nature Balance Angle
+#define MOTOR_ENABLE     //Enable Motor
 
-/**************巡线传感器***************/
+/**************Line Finder***************/
 #define LED_1 !(PINB&(1<<0))  //8  
 #define LED_2 !(PIND&(1<<2))  //2
 #define LED_3 !(PINB&(1<<4))  //12
 #define LED_4 !(PINB&(1<<5))  //13
 
-/***************注册标识位***************/
-#define COMDONE 0x0001    //帧指令结束标识
-#define MOVING 0x0002     //运动中标识
-#define TRACING 0x0004    //巡线标识
-#define START 0x0008      //初始化完成标识
+/***************Regist Flags***************/
+#define COMDONE 0x0001    //Frame Command End
+#define MOVING 0x0002     //Moving
+#define TRACING 0x0004    //Tracing
+#define START 0x0008      //Start
 
 MeEncoderMotor encoder;
 MeInfraredReceiver ir(PORT_6);
 
-/***************MPU6050变量定义**********************/
+/***************MPU6050 Define**********************/
 double accX, accY, accZ;
 double gyroX, gyroY, gyroZ;
 double  compAngleY, gyroYangle;
@@ -31,7 +31,7 @@ int16_t tempRaw;
 uint32_t IMU_timer;
 uint8_t i2cData[14];
 
-/***************PID变量定义**********************/
+/***************PID Define**********************/
 typedef struct
 {
   double P, I, D;
@@ -42,16 +42,16 @@ typedef struct
 PID  PID_angle, PID_speed, PID_turn;
 
 uint32_t FLAG;
-char comdata[19], data_p; //串口缓存数据
+char comdata[19], data_p; //Serial Data
 float joy_x, joy_y;
 
 void setup()
 {
-  /*********************初始化通信********************/
-  Serial.begin(115299);  //串口
-  Wire.begin();           //I2C总线
-  ir.begin();
-  /*********************MPU6050初始化********************/
+  /*********************Initialize********************/
+  Serial.begin(115299);  //Serial
+  Wire.begin();           //I2C Wire
+  ir.begin();             //Infred Received
+  /*********************MPU6050 initialize********************/
   i2cData[0] = 7;
   i2cData[1] = 0x00;
   i2cData[2] = 0x00;
@@ -74,16 +74,16 @@ void setup()
   compAngleY = pitch;
   IMU_timer = micros();
 
-  /*********************编码电机********************/
+  /*********************Encoder********************/
   encoder.begin();
-  encoder.setMode(0, 1);  //pwm直传模式
+  encoder.setMode(0, 1);  //pwm mode
   encoder.setMode(1, 1);
 
-  /*********************其他初始化********************/
+  /*********************PID Initialize********************/
   PID_angle.Setpoint = RELAX_ANGLE;
-  PID_angle.P = 22.0;//18
-  PID_angle.I = 0.05;//0.1
-  PID_angle.D = 0.001;//0.0005
+  PID_angle.P = 22.0;    //18
+  PID_angle.I = 0.05;    //0.1
+  PID_angle.D = 0.001;   //0.0005
 
   PID_turn.P = 10;
   PID_turn.D = 30;
