@@ -1,8 +1,11 @@
+#include "MeOrion.h"
 #include "MeEncoderMotor.h"
+#include "MeSerial.h"
+#include "MeInfraredReceiver.h"
 #include <Wire.h>
 #include <SoftwareSerial.h>
 
-#define RELAX_ANGLE -6.5 //自然平衡角度
+#define RELAX_ANGLE 7.5 //自然平衡角度
 #define MOTOR_ENABLE     //使能电机
 
 /**************巡线传感器***************/
@@ -18,6 +21,8 @@
 #define START 0x0008      //初始化完成标识
 
 MeEncoderMotor encoder;
+MeInfraredReceiver ir(PORT_6);
+
 /***************MPU6050变量定义**********************/
 double accX, accY, accZ;
 double gyroX, gyroY, gyroZ;
@@ -43,9 +48,9 @@ float joy_x, joy_y;
 void setup()
 {
   /*********************初始化通信********************/
-  Serial.begin(115200);  //蓝牙串口
+  Serial.begin(115299);  //串口
   Wire.begin();           //I2C总线
-
+  ir.begin();
   /*********************MPU6050初始化********************/
   i2cData[0] = 7;
   i2cData[1] = 0x00;
@@ -67,7 +72,6 @@ void setup()
   double pitch = atan(-accY / sqrt(accX * accX + accZ * accZ)) * RAD_TO_DEG;
   gyroYangle = pitch;
   compAngleY = pitch;
-  Serial.println(pitch);
   IMU_timer = micros();
 
   /*********************编码电机********************/
@@ -77,48 +81,40 @@ void setup()
 
   /*********************其他初始化********************/
   PID_angle.Setpoint = RELAX_ANGLE;
-  PID_angle.P = 30.0;//18
+  PID_angle.P = 22.0;//18
   PID_angle.I = 0.05;//0.1
-  PID_angle.D = 0.0003;//0.0005
+  PID_angle.D = 0.001;//0.0005
 
   PID_turn.P = 10;
   PID_turn.D = 30;
 
   PID_revalue();
-
   IMU_fillter();
   //FLAG |= TRACING;
   PID_speed.Setpoint = 0;
-  //Serial.println(compAngleY);
-  //判断开机姿态，选择是否巡线
-  /*while (  compAngleY > RELAX_ANGLE + 3 ||  compAngleY < RELAX_ANGLE - 3)
-  {
-    FLAG &= ~TRACING;
-    PID_speed.Setpoint = 0;
-    IMU_fillter();
-  }*/
   gyroYangle = RELAX_ANGLE;
   compAngleY = RELAX_ANGLE;
   FLAG |= START;
-}
 
+}
+long receiveTime = 0;
 void loop()
 {
-  IMU_fillter();
-  /*if (FLAG & TRACING)
-    PID_turn_compute();
-  else
-  {
-    get_cmd();
-    set_value();
-  }*/
-
+  if(ir.buttonState()){
+    while(ir.available()){
+      parseJoystick(ir.read());
+      receiveTime = micros();  
+    }
+  }
+  if(micros()-receiveTime>100000){
+    receiveTime = micros();
+    parseJoystick(0xFA);
+  }
   
-
+  IMU_fillter();
   PID_revalue();
   PID_angle_compute();
   PID_speed_compute();
   PID_angle_compute();
-  //get_uart();
 }
 

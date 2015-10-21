@@ -17,7 +17,7 @@ void PID_revalue(void)
 void PID_angle_compute(void)
 {
   double dt = micros() - PID_angle.Timer ;
-  if (dt > 5000)
+  if (dt > 10000)
   {
     double error = compAngleY - PID_angle.Setpoint ;
     PID_angle.Integral += error * dt * 0.001;
@@ -30,7 +30,6 @@ void PID_angle_compute(void)
     int spd = 250;
     pwm_left = constrain(pwm_left, -spd, spd);
     pwm_right = constrain(pwm_right, -spd, spd);
-
 #ifdef MOTOR_ENABLE
     runMotor(0, pwm_left);
     runMotor(1, pwm_right);
@@ -54,7 +53,6 @@ void PID_speed_compute(void)
     PID_angle.Setpoint =  RELAX_ANGLE + PID_speed.Output;
 
     PID_speed.Timer = micros();
-    Serial.println(PID_speed.Output);
   }
 }
 

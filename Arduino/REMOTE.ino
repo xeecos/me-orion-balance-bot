@@ -1,3 +1,39 @@
+void parseJoystick(unsigned char irCode)
+{
+  if(irCode==0xff||irCode==0){
+    return;
+  }
+//  Serial.println(irCode,HEX);
+  switch(irCode){
+    case IR_BUTTON_UP:{
+      FLAG |= MOVING;
+      PID_speed.Setpoint = -200;
+      break;  
+    }
+    case IR_BUTTON_LEFT:{
+      FLAG |= MOVING;
+      PID_turn.Output = 30;
+      break;  
+    }
+    case IR_BUTTON_DOWN:{
+      FLAG |= MOVING;
+      PID_speed.Setpoint = 200;
+      break;  
+    }
+    case IR_BUTTON_RIGHT:{
+      FLAG |= MOVING;
+      PID_turn.Output = -30;
+      break;  
+    }
+    case 0xFA:{
+      PID_speed.Setpoint = 0;
+      PID_turn.Output  = 0;
+      FLAG &= ~MOVING;
+      break;
+    }
+  }
+    FLAG &= ~COMDONE;
+}
 void get_cmd(void)
 {
   while (Serial.available() > 0)

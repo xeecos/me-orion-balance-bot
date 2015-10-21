@@ -15,23 +15,23 @@ void IMU_fillter(void)
   double dt = (double)(micros() - IMU_timer) / 1000000;
   IMU_timer = micros();
 
-  double pitch = atan(-accY / sqrt(accX * accX + accZ * accZ)) * RAD_TO_DEG;
-  double gyroYrate = -gyroX / 131.0;
+  double pitch = atan(accY / sqrt(accX * accX + accZ * accZ)) * RAD_TO_DEG;
+  double gyroYrate = gyroX / 131.0;
 
   //if (FLAG & START)
     //PID_angle_compute();
 
   gyroYangle += gyroYrate * dt;
   compAngleY = 0.98 * (compAngleY + gyroYrate * dt) + 0.02 * pitch;
-  //Serial.println(compAngleY);
+//  Serial.println(dt);
   if (FLAG & START)
-    if (  compAngleY > 20 ||  compAngleY < -30)
+    if (  compAngleY > 40 ||  compAngleY < -30)
     {
       runMotor(0, 0);
       runMotor(1, 0);
       delay(100);
       while (1);
     }
-  //Serial.println(compAngleY);
+  Serial.println(compAngleY);
 }
 
